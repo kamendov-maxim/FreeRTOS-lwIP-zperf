@@ -1,0 +1,9 @@
+[submodule "lwip/lwip"]
+	path = lwip/lwip
+	url = https://git.savannah.nongnu.org/git/lwip.git
+[submodule "lwip/lwip-contrib"]
+	path = lwip/lwip-contrib
+	url = https://git.savannah.nongnu.org/git/lwip/lwip-contrib.git
+[submodule "freertos"]
+	path = freertos
+	url = https://github.com/megakilo/FreeRTOS-Sim
