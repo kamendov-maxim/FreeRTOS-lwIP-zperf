@@ -29,6 +29,8 @@
  * this code.
  */
 
+#include <getopt.h>
+
 #include "lwip/init.h"
 #include "lwip/opt.h"
 #include "lwip/sys.h"
@@ -41,6 +43,7 @@
 #include "netif/etharp.h"
 
 #include "arch/sys_arch.h"
+#include "apps/udpecho_raw/udpecho_raw.h"
 #include "apps/tcpecho_raw/tcpecho_raw.h"
 
 #include "FreeRTOS.h"
@@ -52,6 +55,12 @@
 
 /* NETIF data */
 static struct netif lpc_netif;
+
+/* (manual) host IP configuration */
+static ip4_addr_t ipaddr, netmask, gw;
+
+/* nonstatic debug cmd option, exported in lwipopts.h */
+unsigned char debug_flags;
 
 /*****************************************************************************
  * Public types/enumerations/variables
@@ -80,7 +89,7 @@ static void tcpip_init_done_signal(void *arg)
 /* LWIP kickoff and PHY link monitor thread */
 static void vSetupIFTask(void *pvParameters)
 {
-  ip_addr_t ipaddr, netmask, gw;
+  //ip_addr_t ipaddr, netmask, gw;
   volatile s32_t tcpipdone = 0;
   uint32_t physts;
   static int prt_ip = 0;
@@ -93,12 +102,7 @@ static void vSetupIFTask(void *pvParameters)
     msDelay(1);
   }
 
-  LWIP_DEBUGF(LWIP_DBG_ON, ("Starting LWIP TCP echo server...\n"));
-
-  /* Static IP assignment */
-  IP4_ADDR(&gw, 10, 1, 10, 1);
-  IP4_ADDR(&ipaddr, 10, 1, 10, 234);
-  IP4_ADDR(&netmask, 255, 255, 255, 0);
+  LWIP_DEBUGF(LWIP_DBG_ON, ("Starting LWIP TCP+UDP echo server...\n"));
 
   /* Add netif interface for lpc17xx_8x */
   if (!netif_add(&lpc_netif, &ipaddr, &netmask, &gw, NULL, tapif_init, ethernet_input)) {
@@ -107,8 +111,9 @@ static void vSetupIFTask(void *pvParameters)
   netif_set_default(&lpc_netif);
   netif_set_up(&lpc_netif);
 
-  /* Initialize and start application */
+  /* Initialize and start applications */
   tcpecho_raw_init();
+  udpecho_raw_init();
 
   static char tmp_buff[16];
   printf("IP_ADDR    : %s\r\n", ipaddr_ntoa_r((const ip_addr_t *) &lpc_netif.ip_addr, tmp_buff, 16));
@@ -141,15 +146,79 @@ void msDelay(uint32_t ms)
 	vTaskDelay((configTICK_RATE_HZ * ms) / 1000);
 }
 
+static struct option longopts[] = {
+  /* turn on debugging output (if build with LWIP_DEBUG) */
+  {"debug", no_argument,        NULL, 'd'},
+  /* help */
+  {"help", no_argument, NULL, 'h'},
+  /* gateway address */
+  {"gateway", required_argument, NULL, 'g'},
+  /* ip address */
+  {"ipaddr", required_argument, NULL, 'i'},
+  /* netmask */
+  {"netmask", required_argument, NULL, 'm'},
+  /* new command line options go here! */
+  {NULL,   0,                 NULL,  0}
+};
+#define NUM_OPTS ((sizeof(longopts) / sizeof(struct option)) - 1)
+
+static void
+usage(void)
+{
+  unsigned char i;
+
+  printf("options:\n");
+  for (i = 0; i < NUM_OPTS; i++) {
+    printf("-%c --%s\n",longopts[i].val, longopts[i].name);
+  }
+}
+
 /**
  * @brief	main routine for example_lwip_tcpecho_freertos_18xx43xx
  * @return	Function should not exit
  */
-int main(void)
+int main(int argc, char *argv[])
 {
   prvSetupHardware();
 
   /* FIXME: Implement command line options to configure the IP address. */
+  struct netif netif;
+  int ch;
+  char ip_str[16] = {0}, nm_str[16] = {0}, gw_str[16] = {0};
+
+  /* Startup defaults (may be overridden by one or more opts) */
+  IP4_ADDR(&gw, 192,168,0,1);
+  IP4_ADDR(&ipaddr, 192,168,0,2);
+  IP4_ADDR(&netmask, 255,255,255,0);
+
+  /* use debug flags defined by debug.h */
+  debug_flags = LWIP_DBG_OFF;
+
+  while ((ch = getopt_long(argc, argv, "dhg:i:m:t:", longopts, NULL)) != -1) {
+    switch (ch) {
+      case 'd':
+        debug_flags |= (LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT);
+        break;
+      case 'h':
+        usage();
+        exit(0);
+        break;
+      case 'g':
+        ip4addr_aton(optarg, &gw);
+        break;
+      case 'i':
+        ip4addr_aton(optarg, &ipaddr);
+        break;
+      case 'm':
+        ip4addr_aton(optarg, &netmask);
+        break;
+      default:
+        usage();
+        break;
+    }
+  }
+  argc -= optind;
+  argv += optind;
 
   /* Add another thread for initializing physical interface. This
      is delayed from the main LWIP initialization. */

@@ -221,14 +221,11 @@ set(LWIP_COMPILE_WARNING_FLAGS
   -Wno-unused-parameter -Wno-unused-variable)
 
 add_library(lwip ${LWIP_SOURCES})
-# freertos simulator is limited to 32 bit, hopefully that's passed down by
-# the freertos target
 target_compile_options(
-  lwip
-  PRIVATE
-    ${LWIP_COMPILE_WARNING_FLAGS})
+  lwip PRIVATE ${LWIP_COMPILE_WARNING_FLAGS})
 target_compile_definitions(
   lwip PUBLIC ${LWIP_PUBLIC_DEFINES} PRIVATE ${LWIP_PRIVATE_DEFINES})
+target_link_libraries(lwip PUBLIC freertos)
 target_include_directories(
   lwip
   PUBLIC
@@ -239,20 +236,10 @@ target_include_directories(
     # FreeRTOS port must be included first.
     "$<BUILD_INTERFACE:${LWIP_CONTRIB_SOURCE_DIR}/ports/unix/port/include>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-target_link_libraries(lwip PUBLIC freertos)
-set_target_properties(lwip PROPERTIES LINK_FLAGS "-m32 -pthread")
 
-
-# FIXME: Add INTERFACE libraries for tcpecho, udpecho and udpecho_raw too.
 add_library(lwip_tcpecho_raw INTERFACE)
 target_compile_options(lwip_tcpecho_raw INTERFACE ${LWIP_COMPILE_WARNING_FLAGS})
-target_compile_definitions(
-  lwip_tcpecho_raw
-  INTERFACE
-    ${LWIP_PUBLIC_DEFINES}
-#  PRIVATE
-#    ${LWIP_PRIVATE_DEFINES}
-    )
+target_compile_definitions(lwip_tcpecho_raw INTERFACE ${LWIP_PUBLIC_DEFINES})
 target_link_libraries(lwip_tcpecho_raw INTERFACE lwip)
 target_include_directories(
   lwip_tcpecho_raw
@@ -265,6 +252,21 @@ target_sources(
     "$<BUILD_INTERFACE:${LWIP_CONTRIB_SOURCE_DIR}/apps/tcpecho_raw/tcpecho_raw.c>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_DATADIR}/lwip/apps/tcpecho_raw/tcpecho_raw.c>")
 
+add_library(lwip_udpecho_raw INTERFACE)
+target_compile_options(lwip_udpecho_raw INTERFACE ${LWIP_COMPILE_WARNING_FLAGS})
+target_compile_definitions(lwip_udpecho_raw INTERFACE ${LWIP_PUBLIC_DEFINES})
+target_link_libraries(lwip_udpecho_raw INTERFACE lwip)
+target_include_directories(
+  lwip_udpecho_raw
+  INTERFACE
+    "$<BUILD_INTERFACE:${LWIP_CONTRIB_SOURCE_DIR}>"
+    "$<INSTALL_INTERFACE:${LWIP_INSTALL_DATADIR}/lwip>")
+target_sources(
+  lwip_udpecho_raw
+  INTERFACE
+    "$<BUILD_INTERFACE:${LWIP_CONTRIB_SOURCE_DIR}/apps/udpecho_raw/udpecho_raw.c>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_DATADIR}/lwip/apps/udpecho_raw/udpecho_raw.c>")
+
 install(
   FILES ${LWIP_HEADERS}
   DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lwip")
@@ -273,4 +275,9 @@ install(
   FILES "${LWIP_CONTRIB_SOURCE_DIR}/apps/tcpecho_raw/tcpecho_raw.h"
         "${LWIP_CONTRIB_SOURCE_DIR}/apps/tcpecho_raw/tcpecho_raw.c"
   DESTINATION "${CMAKE_INSTALL_DATADIR}/lwip/apps/tcpecho_raw")
+
+install(
+  FILES "${LWIP_CONTRIB_SOURCE_DIR}/apps/udpecho_raw/udpecho_raw.h"
+        "${LWIP_CONTRIB_SOURCE_DIR}/apps/udpecho_raw/udpecho_raw.c"
+  DESTINATION "${CMAKE_INSTALL_DATADIR}/lwip/apps/udpecho_raw")
 
