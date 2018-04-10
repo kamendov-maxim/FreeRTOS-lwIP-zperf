@@ -5,5 +5,5 @@
 	path = lwip/lwip-contrib
 	url = https://git.savannah.nongnu.org/git/lwip/lwip-contrib.git
 [submodule "freertos"]
-	path = freertos
+	path = freertos/FreeRTOS-Sim
 	url = https://github.com/megakilo/FreeRTOS-Sim
