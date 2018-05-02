@@ -1,0 +1,8 @@
+set(@CMAKE_PROJECT_NAME@_VERSION x.y.z)
+
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_LC_PROJECT_NAME@-targets.cmake")
+
+#check_required_components(Foo)
+

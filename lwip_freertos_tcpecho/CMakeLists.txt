@@ -1,6 +1,18 @@
-set(TCPECHO_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/freertos_tcpecho.c"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/freertos/FreeRTOSCommonHooks.c")
+cmake_minimum_required(VERSION 3.5)
 
-add_executable(tcpecho ${TCPECHO_SOURCES})
-target_link_libraries(tcpecho freertos lwip lwip_tcpecho_raw lwip_udpecho_raw)
+if(NOT TARGET FreeRTOS-lwIP-Sim::freertos)
+  find_package(FreeRTOS-lwIP-Sim)
+endif()
+
+add_executable(
+  tcpecho
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/freertos_tcpecho.c"
+  "${CMAKE_CURRENT_SOURCE_DIR}/freertos/FreeRTOSCommonHooks.c")
+
+target_link_libraries(
+  tcpecho
+  FreeRTOS-lwIP-Sim::freertos
+  FreeRTOS-lwIP-Sim::lwip
+  FreeRTOS-lwIP-Sim::lwip_tcpecho_raw
+  FreeRTOS-lwIP-Sim::lwip_udpecho_raw)
 
