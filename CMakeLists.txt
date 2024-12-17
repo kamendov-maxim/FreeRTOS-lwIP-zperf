@@ -26,7 +26,7 @@ endfunction()
 
 add_subdirectory(freertos)
 add_subdirectory(lwip)
-add_subdirectory(lwip_freertos_tcpecho)
+add_subdirectory(zperf)
 
 configure_package_config_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_LC_PROJECT_NAME}-config.cmake.in"

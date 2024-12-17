@@ -35,7 +35,12 @@
 #include "arch/cc.h"
 
 #define LWIP_IPV4          1
-#define LWIP_IPV6          0
+#define LWIP_IPV6          1
+#define LWIP_TIMERS 1
+// #define MEMP_NUM_SYS_TIMEOUT 5000
+#define LWIP_FREERTOS_CHECK_CORE_LOCKING 1
+#define LWIP_SO_RCVTIMEO 1
+#define SOCKETS_DEBUG LWIP_DBG_ON
 
 #define LWIP_DBG_MIN_LEVEL 0
 #define LWIP_COMPAT_SOCKETS 1
@@ -80,6 +85,7 @@
 
 extern unsigned char debug_flags;
 #define LWIP_DBG_TYPES_ON debug_flags
+#define LWIP_DBG_TYPES_ON         (SOCKETS_DEBUG)
 
 #define NO_SYS                     0
 #define LWIP_SOCKET                (NO_SYS==0)
@@ -122,7 +128,7 @@ a lot of data that needs to be copied, this should be set high. */
 #define MEMP_NUM_TCP_SEG        16
 /* MEMP_NUM_SYS_TIMEOUT: the number of simulateously active
    timeouts. */
-#define MEMP_NUM_SYS_TIMEOUT    12
+#define MEMP_NUM_SYS_TIMEOUT    18
 
 /* The following four are used only with the sequential API and can be
    set to 0 if the application only will use the raw API. */
