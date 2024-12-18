@@ -193,11 +193,6 @@ int main(int argc, char *argv[])
 {
     prvSetupHardware();
 
-    /* FIXME: Implement command line options to configure the IP address. */
-    struct netif netif;
-    int ch;
-    char ip_str[16] = {0}, nm_str[16] = {0}, gw_str[16] = {0};
-
     /* Startup defaults (may be overridden by one or more opts) */
     IP4_ADDR(&gw, 192, 168, 0, 1);
     IP4_ADDR(&ipaddr, 192, 168, 0, 2);
@@ -213,41 +208,6 @@ int main(int argc, char *argv[])
 
     /* use debug flags defined by debug.h */
     debug_flags = LWIP_DBG_OFF;
-
-    /* while ((ch = getopt_long(argc, argv, "dhg:i:m:t:", longopts, NULL)) != -1) */
-    /* { */
-    /*     switch (ch) */
-    /*     { */
-    /*     case 'd': */
-    /*         debug_flags |= (LWIP_DBG_ON | LWIP_DBG_TRACE | LWIP_DBG_STATE | LWIP_DBG_FRESH | LWIP_DBG_HALT); */
-    /*         break; */
-    /*     case 'h': */
-    /*         usage(); */
-    /*         exit(0); */
-    /*         break; */
-    /*     case 'g': */
-    /*         ip4addr_aton(optarg, &gw); */
-    /*         break; */
-    /*     case 'i': */
-    /*         ip4addr_aton(optarg, &ipaddr); */
-    /*         break; */
-    /*     case 'm': */
-    /*         ip4addr_aton(optarg, &netmask); */
-    /*         break; */
-    /*     default: */
-    /*         usage(); */
-    /*         break; */
-    /*     } */
-    /* } */
-    /* argc -= optind; */
-    /* argv += optind; */
-
-    /* Add another thread for initializing physical interface. This
-       is delayed from the main LWIP initialization. */
-
-    /* xTaskCreate(vSetupIFTask, "SetupIFx", */
-    /*   configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 1UL), */
-    /*   (xTaskHandle *) NULL); */
 
     lwip_init();
     netif_add_ip6_address(&lpc_netif, &ipaddr6, NULL);
@@ -265,7 +225,10 @@ int main(int argc, char *argv[])
     }
 #endif /* LWIP_TCPIP_CORE_LOCKING */
     zperf_init();
-    sys_thread_new("shell", shell_task, argv, configMINIMAL_STACK_SIZE, (tskIDLE_PRIORITY + 1UL));
+    struct args args;
+    args.argc = argc;
+    args.argv = argv;
+    sys_thread_new("shell", shell_task, (void *)&args, configMINIMAL_STACK_SIZE, (tskIDLE_PRIORITY + 1UL));
 
     /* Start the scheduler */
     vTaskStartScheduler();

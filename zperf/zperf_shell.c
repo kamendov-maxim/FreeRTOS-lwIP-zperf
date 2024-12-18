@@ -1435,20 +1435,37 @@ void zperf_shell_init(void)
 /**/
 /* SHELL_CMD_REGISTER(zperf, zperf_commands, "Zperf commands", NULL, 0, 0); */
 
-/* void shell_task(size_t argc, char ** argv) */
-void shell_task()
-{
-    shell_handle_t shell_handle = _shell_handle_buff;
-    /* char *argv[10] = {"cmd_udp_upload", "fda8:06c3:ce53:a890:0000:0000:0000:0008", "5001", "60", "1K", "100M"}; */
-    char *argv[10] = {"cmd_udp_upload", "192.168.0.1", "5001", "60", "1K", "100M"};
-    //, "1K", "1M"};
-    int argc = 6;
+const char * const helpmessage = "Usage:\n \
+                                  upd_upload <address> <port> <duration> <packet size> <baud rate> - udp upload\n \
+                                  tcp_upload <address> <port> <duration> <packet size> <baud rate> - tcp upload\n";
 
-    /*    SHELL_Init(shell_handle, g_serialHandle, "shell : "); */
-    /* SHELL_RegisterCommand(shell_handle, SHELL_COMMAND(zperf)); */
-    shell_cmd_upload(NULL, argc, argv, nip_IPPROTO_UDP);
+void shell_task(struct args * args)
+{
+    if (args->argc == 1)
+    {
+        printf("%s", helpmessage);
+    }
+    else 
+    {
+        int argc = --args->argc;
+        char ** argv = args->argv + 1;
+
+        if (!strcmp(argv[0], "udp_upload"))
+        {
+            shell_cmd_upload(NULL, argc, argv, nip_IPPROTO_UDP);
+        }
+        else if (!strcmp(argv[0], "tcp_upload"))
+        {
+            shell_cmd_upload(NULL, argc, argv, nip_IPPROTO_TCP);
+        }
+        else
+        {
+            printf("Unknown command\n");
+            printf("%s", helpmessage);
+        }
+    }
     while (1)
     {
-    	continue;
+        continue;
     }
 }

@@ -80,6 +80,11 @@ struct zperf_async_upload_context {
 	void *user_data;
 };
 
+struct args {
+    int argc;
+    char ** argv;
+};
+
 static inline uint32_t time_delta(uint32_t ts, uint32_t t)
 {
 	return (t >= ts) ? (t - ts) : (ULONG_MAX - ts + t);
