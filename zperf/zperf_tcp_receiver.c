@@ -194,7 +194,7 @@ use_any_ipv4:
 			goto error;
 		}
 	}
-#if 0
+#if 1
 	if (IS_ENABLED(CONFIG_NET_IPV6)) {
 		struct sockaddr_in6 *in6_addr = zperf_get_sin6();
 		const struct in6_addr *addr = NULL;
@@ -361,6 +361,8 @@ void tcp_receiver_thread(void *ptr1)
 
 void zperf_tcp_receiver_init(void)
 {
+    tcp_receiver_thread_data.name = "reciever";
+    tcp_receiver_thread_data.task_hanble = handle;
 	k_thread_create(&tcp_receiver_thread_data,
 			tcp_receiver_stack_area,
 			K_THREAD_STACK_SIZEOF(tcp_receiver_stack_area),

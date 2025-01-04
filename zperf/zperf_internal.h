@@ -113,4 +113,6 @@ void zperf_shell_init(void);
 
 int zperf_init(void);
 
+void handle(void);
+
 #endif /* __ZPERF_INTERNAL_H */

@@ -45,7 +45,7 @@ static bool convert_port(const char *buf,
  *         false - convert has not been succefull
  * **/
 //#if defined(CONFIG_NET_IPV6)
-#if 0
+#if 1
 static bool parse_ipv6(const char *str,
                        size_t str_len,
 		               struct sockaddr *addr,

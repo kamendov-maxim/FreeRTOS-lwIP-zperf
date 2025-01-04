@@ -24,7 +24,7 @@ LOG_MODULE_REGISTER(net_zperf, CONFIG_NET_ZPERF_LOG_LEVEL);
 // #include "ipv6.h" /* to get infinite lifetime */
 #include "lwip/ip6.h" /* to get infinite lifetime */
 
-#if 0
+#if 1
 static struct sockaddr_in6 in6_addr_my = {
 	.sin6_family = AF_INET6,
 	.sin6_port = PP_HTONS(MY_SRC_PORT),
@@ -36,7 +36,7 @@ static struct sockaddr_in in4_addr_my = {
     .sin_port = PP_HTONS(MY_SRC_PORT),
 };
 
-#if 0
+#if 1
 struct sockaddr_in6 *zperf_get_sin6(void)
 {
 	return &in6_addr_my;
@@ -170,11 +170,12 @@ int zperf_prepare_upload_sock(const struct sockaddr *peer_addr, int tos, int pri
 
         if (tos >= 0)
         {
-            // if (zsock_setsockopt(sock, IPPROTO_IPV6, IPV6_TCLASS,
-            // 		     &tos, sizeof(tos)) != 0) {
-            // 	NET_WARN("Failed to set IPV6_TCLASS socket option. "
-            // 		 "Please enable CONFIG_NET_CONTEXT_DSCP_ECN.");
-            // }
+                #define IPV6_TCLASS 1
+             if (zsock_setsockopt(sock, IPPROTO_IPV6, IPV6_TCLASS,
+             		     &tos, sizeof(tos)) != 0) {
+             	NET_WARN("Failed to set IPV6_TCLASS socket option. "
+             		 "Please enable CONFIG_NET_CONTEXT_DSCP_ECN.");
+             }
         }
 
         break;
@@ -247,7 +248,6 @@ int udp_uploader_run()
 
 int zperf_init(void)
 {
-
     k_work_queue_init(&zperf_work_q);
     k_work_queue_start(&zperf_work_q, zperf_work_q_stack, K_THREAD_STACK_SIZEOF(zperf_work_q_stack),
                        ZPERF_WORK_Q_THREAD_PRIORITY, NULL);
@@ -255,8 +255,8 @@ int zperf_init(void)
 
     zperf_udp_uploader_init();
     zperf_tcp_uploader_init();
-    /* zperf_udp_receiver_init(); */
-    /* zperf_tcp_receiver_init(); */
+    zperf_udp_receiver_init();
+    zperf_tcp_receiver_init();
 
     zperf_session_init();
 
@@ -266,5 +266,22 @@ int zperf_init(void)
     }
     return 0;
 }
+
+
+void handle(void)
+{
+    int counter = 1000;
+    while (counter--) {
+    }
+    int ret = zperf_udp_download_stop();
+    if (ret < 0)
+    {
+        printf("UDP server not running!\n");
+        return;
+    }
+
+    printf("UDP server stopped\n");
+}
+
 
 SYS_INIT(zperf_init, APPLICATION, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);

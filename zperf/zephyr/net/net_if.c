@@ -33,7 +33,6 @@ struct netif * net_if_get_default()
     return &default_net_intrface;
 }
 
-#if 1
 /** see header **/
 net_if_addr * net_if_ipv6_addr_add(struct netif *iface,
                                    const struct in6_addr *addr,
@@ -62,7 +61,6 @@ net_if_addr * net_if_ipv6_addr_add(struct netif *iface,
 
     return res;
 }
-#endif
 /** see header **/
 net_if_addr * net_if_ipv4_addr_add(struct netif *iface,
                                    struct in_addr *addr,
@@ -78,13 +76,9 @@ net_if_addr * net_if_ipv4_addr_add(struct netif *iface,
     ip4_addr_t local_addr;
     IN4_ADDR_TO_IP4_ADDR(&local_addr, addr);
    
-#if 0
     LOCK_TCPIP_CORE();
-#endif
     netif_set_addr(iface, &local_addr, NULL, NULL);
-#if 0
     UNLOCK_TCPIP_CORE();
-#endif
    
     return (&iface->ip_addr);
 }

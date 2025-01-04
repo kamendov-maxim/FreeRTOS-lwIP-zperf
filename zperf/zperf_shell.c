@@ -607,7 +607,7 @@ static void tcp_upload_cb(enum zperf_status status, struct zperf_results *result
  /**/
  /* 	(void)net_icmp_cleanup_ctx(&ctx); */
  /* } */
-
+ 
 static shell_status_t execute_upload(const shell_handle_t sh, const struct zperf_upload_params *param, bool is_udp,
                                      bool async)
 {
@@ -623,8 +623,7 @@ static shell_status_t execute_upload(const shell_handle_t sh, const struct zperf
 
     if (IS_ENABLED(CONFIG_NET_IPV6) && param->peer_addr.ss_family == AF_INET6)
     {
-        /* struct sockaddr_in6 *ipv6 = */
-         		/* (struct sockaddr_in6 *)&param->peer_addr; */
+        struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)&param->peer_addr;
         /* For IPv6, we should make sure that neighbor discovery
          * has been done for the peer. So send ping here, wait
          * some time and start the test after that.
@@ -1014,7 +1013,6 @@ static shell_status_t shell_cmd_upload2(const shell_handle_t sh, size_t argc, ch
 
     start += opt_cnt;
     argc -= opt_cnt;
-    printf("argc is %zu\n", argc);
 
     if (argc < 2)
     {
@@ -1435,20 +1433,20 @@ void zperf_shell_init(void)
 /**/
 /* SHELL_CMD_REGISTER(zperf, zperf_commands, "Zperf commands", NULL, 0, 0); */
 
-const char * const helpmessage = "Usage:\n \
+const char *const helpmessage = "Usage:\n \
                                   upd_upload <address> <port> <duration> <packet size> <baud rate> - udp upload\n \
                                   tcp_upload <address> <port> <duration> <packet size> <baud rate> - tcp upload\n";
 
-void shell_task(struct args * args)
+void shell_task(struct args *args)
 {
     if (args->argc == 1)
     {
         printf("%s", helpmessage);
     }
-    else 
+    else
     {
         int argc = --args->argc;
-        char ** argv = args->argv + 1;
+        char **argv = args->argv + 1;
 
         if (!strcmp(argv[0], "udp_upload"))
         {
@@ -1457,6 +1455,14 @@ void shell_task(struct args * args)
         else if (!strcmp(argv[0], "tcp_upload"))
         {
             shell_cmd_upload(NULL, argc, argv, nip_IPPROTO_TCP);
+        }
+        else if (!strcmp(argv[0], "udp_download"))
+        {
+            cmd_udp_download(NULL, argc, argv);
+        }
+        else if (!strcmp(argv[0], "tcp_download"))
+        {
+            cmd_tcp_download(NULL, argc, argv);
         }
         else
         {

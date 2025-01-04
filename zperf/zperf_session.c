@@ -49,7 +49,7 @@ struct session *get_session(const struct sockaddr *addr,
 			break;
 		}
 
-#if 0
+#if 1
 		if (IS_ENABLED(CONFIG_NET_IPV6) &&
 		    addr->sa_family == AF_INET6 &&
 		    ptr->ip.family == AF_INET6 &&
@@ -77,7 +77,7 @@ struct session *get_session(const struct sockaddr *addr,
 			active->port = addr4->sin_port;
 			active->ip.family = AF_INET;
 			net_ipaddr_copy(&active->ip.in_addr, &addr4->sin_addr);
-#if 0
+#if 1
 		} else if (IS_ENABLED(CONFIG_NET_IPV6) &&
 			   addr->sa_family == AF_INET6) {
 			active->port = addr6->sin6_port;

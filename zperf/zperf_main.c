@@ -32,6 +32,7 @@
 #include <getopt.h>
 #include <stdio.h>
 
+#include "lwip/err.h"
 #include "lwip/init.h"
 #include "lwip/ip6_addr.h"
 #include "lwip/ip_addr.h"
@@ -202,20 +203,25 @@ int main(int argc, char *argv[])
     IP6_ADDR_PART(&ipaddr6, 2, 0x00, 0x00, 0x00, 0x00);
     IP6_ADDR_PART(&ipaddr6, 3, 0x00, 0x00, 0x00, 0x08);
     // fda8:06c3:ce53:a890:0000:0000:0000:0008
-    /* IP64_ADDR(&gw4, 192,168,0,1); */
-    /* IP64_ADDR(&ipaddr4, 192,168,0,2); */
-    /* IP64_MASKADDR(&netmask4, 255,255,255,0); */
 
-    /* use debug flags defined by debug.h */
     debug_flags = LWIP_DBG_OFF;
 
     lwip_init();
-    netif_add_ip6_address(&lpc_netif, &ipaddr6, NULL);
+    s8_t idx;
     /* Add netif interface for lpc17xx_8x */
     if (!netif_add(&lpc_netif, &ipaddr, &netmask, &gw, NULL, tapif_init, ethernet_input))
     {
-        LWIP_ASSERT("Net interface failed to initialize\r\n", 0);
+        LWIP_ASSERT("Net interface failed to initialize\n", 0);
     }
+    netif_create_ip6_linklocal_address(&lpc_netif, 1);
+    err_t err = netif_add_ip6_address(&lpc_netif, &ipaddr6, &idx);
+    if (err != ERR_OK)
+    {
+        printf("Can't add ipv6 address\n");
+    }
+
+    lpc_netif.ip6_addr_state[0] = IP6_ADDR_VALID;
+
     netif_set_default(&lpc_netif);
     netif_set_up(&lpc_netif);
 #if LWIP_TCPIP_CORE_LOCKING

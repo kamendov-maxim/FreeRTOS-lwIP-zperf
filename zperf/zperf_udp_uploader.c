@@ -279,7 +279,7 @@ int zperf_udp_upload(const struct zperf_upload_params *param,
 
 	if (param->peer_addr.ss_family == AF_INET) {
 		port = ntohs(net_sin((struct sockaddr*)(&param->peer_addr))->sin_port);
-#if 0
+#if 1
 	} else if (param->peer_addr.ss_family == AF_INET6) {
 		port = ntohs(net_sin6((struct sockaddr*)(&param->peer_addr))->sin6_port);
 #endif

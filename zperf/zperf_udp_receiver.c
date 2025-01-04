@@ -289,7 +289,7 @@ use_any_ipv4:
 
 		fds[SOCK_ID_IPV4].events = ZSOCK_POLLIN;
 	}
-#if 0
+#if 1
 	if (IS_ENABLED(CONFIG_NET_IPV6)) {
 		const struct in6_addr *in6_addr = NULL;
 
@@ -345,6 +345,7 @@ use_any_ipv6:
 
 	while (true) {
 		ret = zsock_poll(fds, ARRAY_SIZE(fds), POLL_TIMEOUT_MS);
+        
 		if (ret < 0) {
 			NET_ERR("UDP receiver poll error (%d)", errno);
 			goto error;
@@ -417,6 +418,8 @@ static void udp_receiver_thread(void *ptr1)
 
 void zperf_udp_receiver_init(void)
 {
+    udp_receiver_thread_data.name = "reciever";
+    udp_receiver_thread_data.task_hanble = handle;
 	k_thread_create(&udp_receiver_thread_data,
 			udp_receiver_stack_area,
 			K_THREAD_STACK_SIZEOF(udp_receiver_stack_area),
