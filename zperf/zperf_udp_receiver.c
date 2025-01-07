@@ -90,8 +90,8 @@ static int zperf_receiver_send_stat(int sock, const struct sockaddr *addr,
 	build_reply(hdr, stat, reply);
 
 	ret = zsock_sendto(sock, reply, sizeof(reply), 0, addr,
-//			   addr->sa_family == AF_INET6 ?
-//			   sizeof(struct sockaddr_in6) :
+			   addr->sa_family == AF_INET6 ?
+			   sizeof(struct sockaddr_in6) :
 			   sizeof(struct sockaddr_in));
 	if (ret < 0) {
 		NET_ERR("Cannot send data to peer (%d)", errno);

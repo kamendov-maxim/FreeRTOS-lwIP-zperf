@@ -186,23 +186,19 @@ static void usage(void)
     }
 }
 
-/**
- * @brief	main routine for example_lwip_tcpecho_freertos_18xx43xx
- * @return	Function should not exit
- */
 int main(int argc, char *argv[])
 {
     prvSetupHardware();
 
-    /* Startup defaults (may be overridden by one or more opts) */
     IP4_ADDR(&gw, 192, 168, 0, 1);
     IP4_ADDR(&ipaddr, 192, 168, 0, 2);
     IP4_ADDR(&netmask, 255, 255, 255, 0);
-    IP6_ADDR_PART(&ipaddr6, 0, 0xFD, 0xA8, 0x06, 0xC3);
-    IP6_ADDR_PART(&ipaddr6, 1, 0xCE, 0x53, 0xA8, 0x90);
+    IP6_ADDR_PART(&ipaddr6, 0, 0x20, 0x01, 0x0d, 0xb8);
+    IP6_ADDR_PART(&ipaddr6, 1, 0x00, 0x00, 0x00, 0x00);
     IP6_ADDR_PART(&ipaddr6, 2, 0x00, 0x00, 0x00, 0x00);
-    IP6_ADDR_PART(&ipaddr6, 3, 0x00, 0x00, 0x00, 0x08);
-    // fda8:06c3:ce53:a890:0000:0000:0000:0008
+    IP6_ADDR_PART(&ipaddr6, 3, 0x00, 0x00, 0x00, 0x01);
+    ipaddr6.zone = 0;
+
 
     debug_flags = LWIP_DBG_OFF;
 
@@ -220,10 +216,12 @@ int main(int argc, char *argv[])
         printf("Can't add ipv6 address\n");
     }
 
-    lpc_netif.ip6_addr_state[0] = IP6_ADDR_VALID;
+    lpc_netif.ip6_addr_state[0] |= IP6_ADDR_VALID;
+    lpc_netif.ip6_addr_state[idx] |= IP6_ADDR_VALID;
 
     netif_set_default(&lpc_netif);
     netif_set_up(&lpc_netif);
+
 #if LWIP_TCPIP_CORE_LOCKING
     if (sys_mutex_new(&lock_tcpip_core) != ERR_OK)
     {

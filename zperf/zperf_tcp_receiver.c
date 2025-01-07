@@ -107,9 +107,9 @@ static int tcp_bind_listen_connection(zsock_pollfd *pollfd,
 
 	if (address->sa_family == AF_INET) {
 		port = ntohs(net_sin(address)->sin_port);
-	} //else {
-//		port = ntohs(net_sin6(address)->sin6_port);
-//	}
+	} else {
+		port = ntohs(net_sin6(address)->sin6_port);
+	}
 
 	ret = zsock_bind(pollfd->fd, address, sizeof(*address));
 	if (ret < 0) {

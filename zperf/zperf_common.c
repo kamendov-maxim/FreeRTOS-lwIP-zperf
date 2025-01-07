@@ -120,8 +120,8 @@ int zperf_get_ipv4_addr(char *host, struct in_addr *addr)
 
 int zperf_prepare_upload_sock(const struct sockaddr *peer_addr, int tos, int priority, int proto)
 {
-    socklen_t addrlen = // peer_addr->sa_family == AF_INET6 ?
-                        //			    sizeof(struct sockaddr_in6) :
+    socklen_t addrlen =  peer_addr->sa_family == AF_INET6 ?
+                        			    sizeof(struct sockaddr_in6) :
         sizeof(struct sockaddr_in);
     int type = (proto == IPPROTO_UDP) ? SOCK_DGRAM : SOCK_STREAM;
     int sock = -1;
@@ -168,16 +168,16 @@ int zperf_prepare_upload_sock(const struct sockaddr *peer_addr, int tos, int pri
             return -errno;
         }
 
+#if 0
         if (tos >= 0)
         {
-                #define IPV6_TCLASS 1
              if (zsock_setsockopt(sock, IPPROTO_IPV6, IPV6_TCLASS,
              		     &tos, sizeof(tos)) != 0) {
              	NET_WARN("Failed to set IPV6_TCLASS socket option. "
              		 "Please enable CONFIG_NET_CONTEXT_DSCP_ECN.");
              }
         }
-
+#endif
         break;
 
     default:

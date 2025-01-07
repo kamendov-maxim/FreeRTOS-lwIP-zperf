@@ -77,12 +77,12 @@
 /**
  * @brief Defines device IPv4 address
  * **/
-#define CONFIG_NET_CONFIG_MY_IPV4_ADDR       "192.0.2.1"
+#define CONFIG_NET_CONFIG_MY_IPV4_ADDR       "192.168.0.2"
 
 /**
  * @brief Defines host IPv4 address
  * **/
-#define CONFIG_NET_CONFIG_PEER_IPV4_ADDR     "192.0.2.2"
+#define CONFIG_NET_CONFIG_PEER_IPV4_ADDR     "192.168.0.1"
 #endif // CONFIG_NET_IPV4 > 0
 
 /**
