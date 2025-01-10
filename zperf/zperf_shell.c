@@ -1434,8 +1434,10 @@ void zperf_shell_init(void)
 /* SHELL_CMD_REGISTER(zperf, zperf_commands, "Zperf commands", NULL, 0, 0); */
 
 const char *const helpmessage = "Usage:\n \
-                                  upd_upload <address> <port> <duration> <packet size> <baud rate> - udp upload\n \
-                                  tcp_upload <address> <port> <duration> <packet size> <baud rate> - tcp upload\n";
+                                  udp_upload <address> <port> <duration> <packet size> <baud rate> - udp upload\n \
+                                  tcp_upload <address> <port> <duration> <packet size> <baud rate> - tcp upload\n \
+                                  udp_download <port> <address> \n \
+                                  tcp_download <port> <address> \n";
 
 void shell_task(struct args *args)
 {

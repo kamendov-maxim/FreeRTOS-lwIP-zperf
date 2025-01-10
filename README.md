@@ -1,10 +1,9 @@
-Simple project that shows how to build the tcpecho example from the [LPCOpen Libraries and Examples](https://www.nxp.com/support/developer-resources/software-development-tools/lpc-developer-resources-/lpcopen-libraries-and-examples:LPC-OPEN-LIBRARIES) kit against the [FreeRTOS simulator](https://github.com/megakilo/FreeRTOS-Sim) in combination with [lwIP](https://savannah.nongnu.org/projects/lwip/).
-
+App to run zephyr zperf tests with lwIP + FreeRTOS
 To build the simulator:
 
 ```
-git clone https://github.com/k0ekk0ek/FreeRTOS-lwIP-Sim.git
-cd FreeRTOS-lwIP-Sim
+git clone https://github.com/kamendov-maxim/FreeRTOS-lwIP-zperf.git
+cd FreeRTOS-lwIP-zperf
 git submodule update --init --recursive
 mkdir build
 cd build
@@ -12,27 +11,19 @@ cmake ..
 cmake --build .
 ```
 
-To install the simulator:
-
+Before running test app you should set up tap interface
 ```
-cd FreeRTOS-lwIP-Sim/build
-cmake --build . --target install
-```
-
-The above step will install the simulator into /opt/freertos-lwip-sim. The location was chosen so that headers and libraries that ship with the simulator will not clash with possibly existing installations. Using /opt/freertos-lwip-sim also ensures that freertos-lwip-sim-config.cmake (ProjectConfig.cmake) will be picked up by ``find_package(FreeRTOS-lwIP-Sim)``.
-
-The example will be available in /opt/freertos-lwip-sim/share/examples/lwip_freertos_tcpecho.
-
-To build the example:
-
-```
-cp -r /opt/freertos-lwip-sim/share/examples/lwip_freertos_tcpecho ~/
-cd ~/lwip_freertos_tcpecho
-mkdir build
-cd build
-cmake ..
-cmake --build .
+sudo ip tuntap add mode tap tap0
+sudo ip -6 address add 2001:db8::2/64 dev tap0
 ```
 
-Simply run the tcpecho server by executing the resulting binary.
+Run tests by executing the build/zperf/zperf binary with arguments specifying particular test.
 
+Output of ```zperf --help```:
+```
+Usage:
+udp_upload <address> <port> <duration> <packet size> <baud rate> - udp upload
+tcp_upload <address> <port> <duration> <packet size> <baud rate> - tcp upload
+udp_download <port> <address> 
+tcp_download <port> <address>
+```
